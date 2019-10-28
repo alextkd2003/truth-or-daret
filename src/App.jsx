@@ -6,7 +6,6 @@ import End from './views/end';
 
 // react
 
-
 const gameView = {
   home: 'home',
   game: 'game',
@@ -18,6 +17,16 @@ class App extends React.Component {
     activeGameView: 'home'
   }
 
+  changeGameView = gameView => {
+    const gameViewValues = gameView.values;
+    if (gameViewValues.contains(gameView)) {
+      this.setState({
+        ...this.state,
+        activeGameView: gameView
+      })        
+    }
+  }
+
   render() {
 
     return (
@@ -26,10 +35,10 @@ class App extends React.Component {
           <Col>
             {
               this.state.activeGameView === gameView.home ? 
-                <Home /> : 
+                <Home changeGameView={this.changeGameView} /> : 
                 this.state.activeGameView === gameView.game ? 
-                  <Game /> : 
-                  <End />
+                  <Game changeGameView={this.changeGameView} /> : 
+                  <End changeGameView={this.changeGameView} />
             }
           </Col>
         </Row>

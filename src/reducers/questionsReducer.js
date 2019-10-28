@@ -23,7 +23,7 @@ export const questionsReducer = (state=initialState, action) => {
         questions: action.payload,
         loading: false
       }
-    case FETCH_QUESTIONS_ERROR: 
+    case FETCH_QUESTIONS_ERROR:
       return {
         ...state,
         loading: false,

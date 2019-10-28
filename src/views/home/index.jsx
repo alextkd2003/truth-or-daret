@@ -3,16 +3,20 @@ import PropTypes from 'prop-types';
 import {Form, Button} from 'react-bootstrap';
 import Swal from 'sweetalert2';
 
+// redux
+import {connect} from 'react-redux';
+import {} from '../../actions/types'
+
 const errors = {
   wrongUserQuantity: 'wrongUserQuantity'
 }
 
-export default class Home extends Component {
+class Home extends Component {
 
   state = {
     playerQuantity: 2,
     players: [],
-    error: false
+    questionsByMacha: "true"
   }
 
   onChange = (e) => {
@@ -33,6 +37,7 @@ export default class Home extends Component {
 
   onSubmit = e => {
     e.preventDefault();
+    this.props.changeGameView( 'game' );
   }
 
   displayNameForm() {
@@ -64,6 +69,12 @@ export default class Home extends Component {
             onChange={this.onChange}
           />
         </Form.Group>
+        <Form.Group>
+          <Form.Control as="select" name="questionsByMacha" onChange={this.onChange}>
+            <option value={true}>Macha will give u the questions</option>
+            <option value={false}>Player will ask</option>
+          </Form.Control>
+        </Form.Group>
         {this.displayNameForm()}
         <Button variant="primary" type="submit">
           Start
@@ -72,4 +83,10 @@ export default class Home extends Component {
       </>
     )
   }
+}
+
+export default connect(null, {})(Home);
+
+Home.propTypes = {
+  changeGameView: PropTypes.func.isRequired
 }
