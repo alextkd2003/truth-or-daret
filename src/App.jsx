@@ -17,13 +17,15 @@ class App extends React.Component {
     activeGameView: 'home'
   }
 
-  changeGameView = gameView => {
-    const gameViewValues = gameView.values;
-    if (gameViewValues.contains(gameView)) {
+  changeGameView = view => {
+    const gameViewValues = Object.values(gameView);
+    console.log(gameViewValues);
+
+    if (gameViewValues.includes(view)) {
       this.setState({
         ...this.state,
-        activeGameView: gameView
-      })        
+        activeGameView: view
+      });        
     }
   }
 

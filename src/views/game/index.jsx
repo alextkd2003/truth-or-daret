@@ -1,10 +1,18 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 
-export default class Game extends Component {
+//redux
+import {connect} from 'react-redux';
+import {fetchQuestions} from '../../actions/questionsAction';
+
+class Game extends Component {
   static propTypes = {
     players: PropTypes.array.isRequired,
-    questions: PropTypes.array.isRequired
+    questions: PropTypes.object.isRequired
+  }
+
+  componentDidMount() {
+    this.props.fetchQuestions();
   }
 
   render() {
@@ -15,3 +23,10 @@ export default class Game extends Component {
     )
   }
 }
+
+const mapStateToProps = state => ({
+  questions: state.questions,
+  players: state.players.players
+});
+
+export default connect(mapStateToProps, {fetchQuestions})(Game);
