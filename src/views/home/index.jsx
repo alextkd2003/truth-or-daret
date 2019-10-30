@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {Form, Button} from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import uuid from 'uuid/v4';
+import './styles.scss';
 
 // redux
 import {connect} from 'react-redux';
@@ -12,16 +13,15 @@ const errors = {
   wrongUserQuantity: 'wrongUserQuantity'
 }
 
+const initialState = {
+  playerQuantity: 0,
+  players: [],
+  questionsByMacha: "true"
+}
+
 class Home extends Component {
 
-  state = {
-    playerQuantity: 2,
-    players: [
-      {name: 'Player 1', id: uuid()},
-      {name: 'Player 2', id: uuid()}
-    ],
-    questionsByMacha: "true"
-  }
+  state = initialState;
 
   onChange = e => {
     this.setState({
@@ -38,18 +38,40 @@ class Home extends Component {
         text: 'You need to enter a valid user quantity up to 20!'
       });
     } else {
+      // creating players
+      const newPlayersQuantity = e.target.value - this.state.playerQuantity;
+      let newPlayerArray = [...this.state.players];
+
+      if (newPlayersQuantity > 0) {
+        console.log(this.state.playerQuantity, this.state.playerQuantity + newPlayersQuantity);
+        for (let i = this.state.playerQuantity; i < this.state.playerQuantity + newPlayersQuantity; i++) {
+          const newPlayer = {
+            name: 'Player ' + (i+1),
+            id: uuid()
+          }
+          newPlayerArray.push(newPlayer);
+          console.log(newPlayerArray);
+        }
+        this.setState({
+          ...this.state,
+          players: newPlayerArray
+        });
+      } else {
+        newPlayerArray.slice(newPlayersQuantity, newPlayerArray.length);
+        this.setState({
+          ...this.state,
+          players: newPlayerArray
+        });
+      }
       this.setState({
         ...this.state,
         playerQuantity: e.target.value
       });
-
-      // creating players
-      const newPlayersQuantity = e.target.value - this.state.playerQuantity;
-      
     }
   }
 
   onNameChange = e => {
+    console.log('here');
     const playerNameIndex = e.currentTarget.dataset.index;
     console.log(playerNameIndex);
     const newPlayer = {
@@ -107,9 +129,18 @@ class Home extends Component {
           </Form.Control>
         </Form.Group>
         {this.displayNameForm()}
-        <Button variant="primary" type="submit">
-          Start
-        </Button>
+        <Form.Group>
+          {
+            this.state.playerQuantity > 0 ? 
+              <Button variant="primary" type="submit" className="mx-2">
+                Start
+              </Button> :
+            null
+          }
+          <Button variant="primary" type="reset" className="mx-2">
+            Reset
+          </Button>
+        </Form.Group>
       </Form>
       </>
     )
