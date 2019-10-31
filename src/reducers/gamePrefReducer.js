@@ -3,8 +3,7 @@ import {
 } from '../actions/types'
 
 const initialState ={
-  playerQuantity: 0,
-  questionsByMacha: true
+  questionsByMacha: 'true'
 }
 
 export const gamePrefReducer = (state=initialState, action) => {

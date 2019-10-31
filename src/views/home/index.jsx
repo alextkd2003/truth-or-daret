@@ -8,14 +8,14 @@ import './styles.scss';
 // redux
 import {connect} from 'react-redux';
 import {setPlayers} from '../../actions/playersAction';
-
-const errors = {
-  wrongUserQuantity: 'wrongUserQuantity'
-}
+import {setMachaQuestions} from '../../actions/gameConfAction';
 
 const initialState = {
-  playerQuantity: 0,
-  players: [],
+  playerQuantity: 1,
+  players: [{
+    name: 'Player 1',
+    id: uuid()
+  }],
   questionsByMacha: "true"
 }
 
@@ -23,14 +23,7 @@ class Home extends Component {
 
   state = initialState;
 
-  onChange = e => {
-    this.setState({
-      ...this.state,
-      [e.target.name]: e.target.value
-    });
-  }
-
-  onSetPlayerQuantity = (e) => {
+  onSetPlayerQuantity = e => {
     if (e.target.value > 20 || e.target.value < 1) {
       Swal.fire({
         type: 'error',
@@ -39,74 +32,76 @@ class Home extends Component {
       });
     } else {
       // creating players
-      const newPlayersQuantity = e.target.value - this.state.playerQuantity;
-      let newPlayerArray = [...this.state.players];
+      const quantityToAddDelete = e.target.value - this.state.playerQuantity;
+      let tempPlayerArray = [...this.state.players];
 
-      if (newPlayersQuantity > 0) {
-        console.log(this.state.playerQuantity, this.state.playerQuantity + newPlayersQuantity);
-        for (let i = this.state.playerQuantity; i < this.state.playerQuantity + newPlayersQuantity; i++) {
-          const newPlayer = {
-            name: 'Player ' + (i+1),
-            id: uuid()
+      if (quantityToAddDelete !== 0) {
+        if (quantityToAddDelete > 0) { // add new players
+          for (let i = (tempPlayerArray.length); i < e.target.value; i++) {
+            const newPlayer = {
+              name: 'Player ' + (i + 1),
+              id: uuid()
+            }
+            tempPlayerArray.push(newPlayer);
+            console.log(tempPlayerArray);
           }
-          newPlayerArray.push(newPlayer);
-          console.log(newPlayerArray);
+        } else {
+          const quantityToDelete = this.state.playerQuantity - e.target.value;
+          console.log(quantityToDelete);
+          tempPlayerArray.splice(tempPlayerArray.length - quantityToDelete, tempPlayerArray.length);
         }
         this.setState({
           ...this.state,
-          players: newPlayerArray
-        });
-      } else {
-        newPlayerArray.slice(newPlayersQuantity, newPlayerArray.length);
-        this.setState({
-          ...this.state,
-          players: newPlayerArray
+          playerQuantity: e.target.value,
+          players: tempPlayerArray
         });
       }
-      this.setState({
-        ...this.state,
-        playerQuantity: e.target.value
-      });
     }
   }
 
-  onNameChange = e => {
-    console.log('here');
-    const playerNameIndex = e.currentTarget.dataset.index;
-    console.log(playerNameIndex);
-    const newPlayer = {
-      id: uuid(),
-      name: e.currentTarget.value
-    } 
+  onChange = e => {
+    this.setState({
+      ...this.state,
+      [e.target.name]: e.target.value
+    });
+  }
+
+  onChangePlayerName = e => {
+    const playerIndex = e.target.dataset.index;
 
     this.setState({
       ...this.state,
-      players: this.state.players.map((player, index) => index === playerNameIndex ? newPlayer : player)
+      players: this.state.players.map((player, index) => index === parseInt(playerIndex) ? {
+        id: player.id,
+        name: e.target.value,
+      } : player)
     });
+  }
+
+  displayNameForm() {
+    const namesFormArray = [];
+
+    this.state.players.forEach((player, index) => {
+      namesFormArray.push(
+        <Form.Group key = {index} controlId="input-player-name">
+          <Form.Control 
+            type='text'
+            placeholder="player name"
+            data-index={index} 
+            defaultValue={player.name}
+            onChange={this.onChangePlayerName}
+          />
+        </Form.Group>
+      )
+    });
+    return namesFormArray;
   }
 
   onSubmit = e => {
     e.preventDefault();
     this.props.setPlayers(this.state.players);
+    this.props.setMachaQuestions(this.state.questionsByMacha);
     this.props.changeGameView( 'game' );
-  }
-
-  displayNameForm() {
-    const namesFormArray = [];
-    for (let i = 0; i < this.state.players.length; i++) {
-      namesFormArray.push(
-        <Form.Group key = {i} controlId="input-player-name">
-          <Form.Control 
-            type='text'
-            data-index={i}
-            placeholder="player name" 
-            defaultValue={this.state.players[i].name}
-            onChange={this.onNameChange}
-          />
-        </Form.Group>
-      )
-    }
-    return namesFormArray;
   }
 
   render() {
@@ -137,9 +132,6 @@ class Home extends Component {
               </Button> :
             null
           }
-          <Button variant="primary" type="reset" className="mx-2">
-            Reset
-          </Button>
         </Form.Group>
       </Form>
       </>
@@ -147,7 +139,7 @@ class Home extends Component {
   }
 }
 
-export default connect(null, {setPlayers})(Home);
+export default connect(null, {setPlayers, setMachaQuestions})(Home);
 
 Home.propTypes = {
   changeGameView: PropTypes.func.isRequired
